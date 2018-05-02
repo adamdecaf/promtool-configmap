@@ -14,18 +14,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ConfigMap is the minimum representation of a kubernetes ConfigMap object
+// for us to properly parse and validate the nested rules (or prometheus config)
+//
 // https://v1-8.docs.kubernetes.io/docs/api-reference/v1.8/#configmap-v1-core
-
-// kind: ConfigMap
-// apiVersion: v1
-// data:
-//   blackbox.rules.yaml: |+
-
-// "kind": "ConfigMap",
-// "apiVersion": "v1",
-// "data": {
-//    "postgresql.rules.yaml": "..."
-
 type ConfigMap struct {
 	ApiVersion string            `json:"apiVersion", yaml:"apiVersion"`
 	Kind       string            `json:"kind", yaml:"kind"`
@@ -36,7 +28,7 @@ func (c ConfigMap) validate() error {
 	// if c.ApiVersion != "v1" { // TODO(adam): why does this fail?
 	// 	return fmt.Errorf("unknown apiVersion %q", c.ApiVersion)
 	// }
-	if c.Kind != "ConfigMap" { // TODO(adam): flag to enable this?
+	if c.Kind != "ConfigMap" {
 		return fmt.Errorf("got other k8s object %s", c.Kind)
 	}
 	if len(c.Data) == 0 {
@@ -104,7 +96,15 @@ func main() {
 }
 
 func showHelp() {
-	fmt.Println("help") // TODO(adam)
+	fmt.Println(`Usage of promtool-rules-configmap
+
+This tool is a utility to run the same promtool config and rule checks against a kubernetes ConfigMap object.
+
+USAGE
+
+  promtool-rules-configmap [file ...]
+
+  cat rules.yaml | promtool-rules-configmap --`)
 }
 
 func check(r io.Reader) error {
