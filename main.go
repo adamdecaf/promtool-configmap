@@ -62,11 +62,19 @@ func main() {
 
 	foundErrors := false
 
-	// TODO(adam): check -- for stdin, call check(os.Stdin) instead
-
-	// Assume each argument is a filepath
 	for i := range os.Args[1:] {
 		rawPath := os.Args[1:][i]
+
+		// read from stdin if we see '--'
+		if rawPath == "--" {
+			if err := check(os.Stdin); err != nil {
+				foundErrors = true
+				fmt.Printf("ERROR validating rules: %v\n", err)
+			}
+			continue
+		}
+
+		// read arg as a filepath
 		path, err := filepath.Abs(rawPath)
 		if err != nil {
 			foundErrors = true
