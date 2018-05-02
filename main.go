@@ -47,7 +47,12 @@ func (c ConfigMap) validate() error {
 	for k,v := range c.Data {
 		groups, errs := rulefmt.Parse([]byte(v))
 		if len(errs) != 0 {
-			return errors.New("bad") // TODO(adam): strings.Join(errs, ", ") ... ? .Wrap?
+			buf := strings.Builder{}
+			buf.WriteString("error validating rule file\n")
+			for i := range errs {
+				buf.WriteString(fmt.Sprintf(" %v\n", errs[i].Error()))
+			}
+			return errors.New(buf.String())
 		}
 
 		if err := groups.Validate(); err != nil {
