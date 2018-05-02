@@ -1,0 +1,7 @@
+{
+   "apiVersion": "v1",
+   "data": {
+      "test.rules.yaml": "\"groups\": \n- \"name\": \"./test.rules\"\n  \"rules\": \n  - \"alert\": \"TestAlert\"\n    \"annotations\": \n      \"description\": \"check fialed\"\n    \"expr\": \"vector(0)\"\n    \"labels\": \n      \"severity\": \"warning\""
+   },
+   "kind": "ConfigMap"
+}

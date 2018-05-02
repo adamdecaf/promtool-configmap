@@ -1,0 +1,7 @@
+{
+   "apiVersion": "v1",
+   "data": {
+      "test.rules.yaml": "\"groups\": \n- bad"
+   },
+   "kind": "ConfigMap"
+}
