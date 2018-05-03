@@ -36,7 +36,7 @@ func (c ConfigMap) validate() error {
 	}
 
 	// Check each yaml blob
-	for k,v := range c.Data {
+	for k, v := range c.Data {
 		groups, errs := rulefmt.Parse([]byte(v))
 		if len(errs) != 0 {
 			buf := strings.Builder{}

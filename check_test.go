@@ -7,27 +7,27 @@ import (
 
 func TestCheck(t *testing.T) {
 	cases := []struct {
-		path string
+		path  string
 		valid bool
 	}{
 		{
-			path: "testdata/bad.yaml",
+			path:  "testdata/bad.yaml",
 			valid: false,
 		},
 		{
-			path: "testdata/bad.json",
+			path:  "testdata/bad.json",
 			valid: false,
 		},
 		{
-			path: "testdata/empty.yaml",
+			path:  "testdata/empty.yaml",
 			valid: false,
 		},
 		{
-			path: "testdata/good.yaml",
+			path:  "testdata/good.yaml",
 			valid: true,
 		},
 		{
-			path: "testdata/good.json",
+			path:  "testdata/good.json",
 			valid: true,
 		},
 	}
