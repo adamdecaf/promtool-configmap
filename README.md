@@ -2,6 +2,12 @@
 
 Run `promtool check rules` on kubernetes `ConfigMaps` without the fuss of translating between the formats.
 
+### Install
+
+```
+$ go get github.com/adamdecaf/promtool-rules-configmap
+```
+
 ### Usage
 
 Pass your `ConfigMap` objects into `promtool-rules-configmap`:
