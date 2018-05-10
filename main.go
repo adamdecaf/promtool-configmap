@@ -40,7 +40,7 @@ func (c ConfigMap) validate() error {
 		groups, errs := rulefmt.Parse([]byte(v))
 		if len(errs) != 0 {
 			buf := strings.Builder{}
-			buf.WriteString("error validating rule file\n")
+			buf.WriteString(fmt.Sprintf("when validating %s in rule file:\n", k))
 			for i := range errs {
 				buf.WriteString(fmt.Sprintf(" %v\n", errs[i].Error()))
 			}
@@ -48,7 +48,7 @@ func (c ConfigMap) validate() error {
 		}
 
 		if err := groups.Validate(); err != nil {
-			return fmt.Errorf("error validating %s, err=%v", k, err)
+			return fmt.Errorf("when validating %s, err=%v", k, err)
 		}
 	}
 	return nil
@@ -69,7 +69,7 @@ func main() {
 		if rawPath == "--" {
 			if err := check(os.Stdin); err != nil {
 				foundErrors = true
-				fmt.Printf("ERROR validating rules: %v\n", err)
+				fmt.Printf("ERROR validating rules: \n%v\n", err)
 			}
 			continue
 		}
@@ -91,7 +91,7 @@ func main() {
 
 		if err := check(f); err != nil {
 			foundErrors = true
-			fmt.Printf("ERROR validating rules for %s, err=%v\n", path, err)
+			fmt.Printf("ERROR validating rules for %s \n%v\n", path, err)
 			continue
 		}
 
