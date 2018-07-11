@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -54,16 +55,29 @@ func (c ConfigMap) validate() error {
 	return nil
 }
 
+const Version = "0.1.0-dev"
+
+var (
+	flagVersion = flag.Bool("version", false, fmt.Sprintf("Show the version (%s)", Version))
+)
+
 func main() {
-	if len(os.Args) == 1 || (len(os.Args) == 2 && strings.ToLower(os.Args[1]) == "help") {
+	flag.Parse()
+
+	if *flagVersion {
+		fmt.Println(Version)
+		os.Exit(0)
+	}
+
+	if flag.NArg() == 0 || (flag.NArg() == 1 && strings.ToLower(flag.Arg(0)) == "help") {
 		showHelp()
 		os.Exit(1)
 	}
 
 	foundErrors := false
 
-	for i := range os.Args[1:] {
-		rawPath := os.Args[1:][i]
+	for i := range flag.Args() {
+		rawPath := flag.Arg(i)
 
 		// read from stdin if we see '--'
 		if rawPath == "--" {
