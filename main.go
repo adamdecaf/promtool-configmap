@@ -55,7 +55,7 @@ func (c ConfigMap) validate() error {
 	return nil
 }
 
-const Version = "0.1.0-dev"
+const Version = "0.1.0"
 
 var (
 	flagVersion = flag.Bool("version", false, fmt.Sprintf("Show the version (%s)", Version))
