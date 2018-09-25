@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -11,72 +12,32 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/prometheus/prometheus/pkg/rulefmt"
 	"gopkg.in/yaml.v2"
 )
-
-// ConfigMap is the minimum representation of a kubernetes ConfigMap object
-// for us to properly parse and validate the nested rules (or prometheus config)
-//
-// https://v1-8.docs.kubernetes.io/docs/api-reference/v1.8/#configmap-v1-core
-type ConfigMap struct {
-	ApiVersion string            `json:"apiVersion", yaml:"apiVersion"`
-	Kind       string            `json:"kind", yaml:"kind"`
-	Data       map[string]string `json:"data", yaml:"data"`
-}
-
-func (c ConfigMap) validate() error {
-	// if c.ApiVersion != "v1" { // TODO(adam): why does this fail?
-	// 	return fmt.Errorf("unknown apiVersion %q", c.ApiVersion)
-	// }
-	if c.Kind != "ConfigMap" {
-		return fmt.Errorf("got other k8s object %s", c.Kind)
-	}
-	if len(c.Data) == 0 {
-		return errors.New("empty ConfigMap")
-	}
-
-	// Check each yaml blob
-	for k, v := range c.Data {
-		groups, errs := rulefmt.Parse([]byte(v))
-		if len(errs) != 0 {
-			buf := strings.Builder{}
-			buf.WriteString(fmt.Sprintf("when validating %s in rule file:\n", k))
-			for i := range errs {
-				buf.WriteString(fmt.Sprintf(" %v\n", errs[i].Error()))
-			}
-			return errors.New(buf.String())
-		}
-
-		if err := groups.Validate(); err != nil {
-			return fmt.Errorf("when validating %s, err=%v", k, err)
-		}
-	}
-	return nil
-}
 
 const Version = "0.2.0-dev"
 
 var (
+	flagVerbose = flag.Bool("verbose", false, "verbose output (show promtool output)")
 	flagVersion = flag.Bool("version", false, fmt.Sprintf("Show the version (%s)", Version))
 )
 
 func main() {
 	flag.Parse()
 
+	// early exits
 	if *flagVersion {
 		fmt.Println(Version)
 		os.Exit(0)
 	}
-
-	if flag.NArg() == 0 || (flag.NArg() == 1 && strings.ToLower(flag.Arg(0)) == "help") {
+	if flag.NArg() == 0 || strings.EqualFold(flag.Arg(0), "help") {
 		showHelp()
 		os.Exit(1)
 	}
 
-	foundErrors := false
-
-	for i := range flag.Args() {
+	args := flag.Args()
+	var foundErrors bool
+	for i := range args {
 		rawPath := flag.Arg(i)
 
 		// read from stdin if we see '--'
@@ -103,6 +64,10 @@ func main() {
 			continue
 		}
 
+		if *flagVerbose {
+			fmt.Printf(" Checking %s...\n", rawPath)
+		}
+
 		if err := check(f); err != nil {
 			foundErrors = true
 			fmt.Printf("ERROR validating rules for %s \n%v\n", path, err)
@@ -124,7 +89,7 @@ This tool is a utility to run the same promtool config and rule checks against a
 
 USAGE
 
-  promtool-rules-configmap [file ...]
+  promtool-rules-configmap [-verbose] [file ...]
 
   cat rules.yaml | promtool-rules-configmap --`)
 }
@@ -137,18 +102,36 @@ func check(r io.Reader) error {
 	}
 
 	var cfg ConfigMap
-
-	// read as json
-	err = json.Unmarshal(bs, &cfg)
-	if err == nil {
-		return cfg.validate()
+	parts := bytes.Split(bs, []byte("---"))
+	if len(parts) == 0 {
+		return errors.New("no objecs found")
 	}
 
-	// read as yaml
-	err = yaml.Unmarshal(bs, &cfg)
-	if err == nil {
-		return cfg.validate()
-	}
+	checked := 0
+	for i := range parts {
+		if bytes.Equal(parts[i], []byte("")) {
+			continue
+		}
+		checked++
 
-	return errors.New("unable to parse file as json or yaml")
+		// read as json
+		if err := json.Unmarshal(parts[i], &cfg); err == nil {
+			if err := cfg.validate(); err == nil {
+				return nil // return early if successful
+			}
+		}
+
+		// read as yaml
+		if err := yaml.Unmarshal(parts[i], &cfg); err == nil {
+			if err := cfg.validate(); err != nil {
+				return fmt.Errorf("ERROR: %v", err)
+			}
+		} else {
+			return errors.New("unknown format for ConfigMap, tried json and yaml")
+		}
+	}
+	if checked > 0 {
+		return nil
+	}
+	return errors.New("no objects checked")
 }

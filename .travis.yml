@@ -6,13 +6,16 @@ os:
   - osx
 
 go:
-  - "1.10.x"
+  - "1.11.x"
   - master
 
 matrix:
   fast_finish: true
   allow_failures:
     - go: master
+
+before_script:
+  - go get github.com/prometheus/prometheus/cmd/promtool
 
 script:
   - go test ./...

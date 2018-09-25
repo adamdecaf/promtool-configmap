@@ -10,24 +10,31 @@ func TestCheck(t *testing.T) {
 		path  string
 		valid bool
 	}{
+		// empty config, never valid
 		{
-			path:  "testdata/bad.yaml",
+			path:  "testdata/empty.yml",
+			valid: false,
+		},
+		// rule files
+		{
+			path:  "testdata/rules-bad.yml",
 			valid: false,
 		},
 		{
-			path:  "testdata/bad.json",
+			path:  "testdata/rules-bad.json",
 			valid: false,
 		},
 		{
-			path:  "testdata/empty.yaml",
-			valid: false,
-		},
-		{
-			path:  "testdata/good.yaml",
+			path:  "testdata/rules-good.yml",
 			valid: true,
 		},
 		{
-			path:  "testdata/good.json",
+			path:  "testdata/rules-good.json",
+			valid: true,
+		},
+		// prom configs
+		{
+			path:  "testdata/config-good.yml",
 			valid: true,
 		},
 	}

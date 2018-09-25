@@ -33,3 +33,5 @@ ERROR validating rules for /Users/adam/.../bad.json, err=error validating rule f
  yaml: unmarshal errors:
   line 2: cannot unmarshal !!str `bad` into rulefmt.RuleGroup
 ```
+
+Note: [`promtool`](https://github.com/prometheus/prometheus/tree/master/cmd/promtool) is required on PATH.
