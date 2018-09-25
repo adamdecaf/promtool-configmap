@@ -14,5 +14,8 @@ matrix:
   allow_failures:
     - go: master
 
+before_script:
+  - go get github.com/prometheus/prometheus/cmd/promtool
+
 script:
   - go test ./...
