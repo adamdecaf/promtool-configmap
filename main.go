@@ -15,7 +15,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const Version = "0.2.0-dev"
+const Version = "0.2.0"
 
 var (
 	flagVerbose = flag.Bool("verbose", false, "verbose output (show promtool output)")
