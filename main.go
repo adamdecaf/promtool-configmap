@@ -116,6 +116,9 @@ func check(r io.Reader) error {
 
 		// read as json
 		if err := json.Unmarshal(parts[i], &cfg); err == nil {
+			if cfg.Kind != "ConfigMap" {
+				continue
+			}
 			if err := cfg.validate(); err == nil {
 				return nil // return early if successful
 			}
@@ -123,6 +126,9 @@ func check(r io.Reader) error {
 
 		// read as yaml
 		if err := yaml.Unmarshal(parts[i], &cfg); err == nil {
+			if cfg.Kind != "ConfigMap" {
+				continue
+			}
 			if err := cfg.validate(); err != nil {
 				return fmt.Errorf("ERROR: %v", err)
 			}
