@@ -2,8 +2,6 @@
 
 Run `promtool` over kubernetes `ConfigMaps` without the fuss of translating between the formats.
 
-- Note: Only `promtool check rules` is supported currently
-
 ### Install
 
 ```
