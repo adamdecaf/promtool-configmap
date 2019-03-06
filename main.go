@@ -83,15 +83,15 @@ func main() {
 }
 
 func showHelp() {
-	fmt.Println(`Usage of promtool-rules-configmap
+	fmt.Println(`Usage of promtool-configmap
 
 This tool is a utility to run the same promtool config and rule checks against a kubernetes ConfigMap object.
 
 USAGE
 
-  promtool-rules-configmap [-verbose] [file ...]
+  promtool-configmap [-verbose] [file ...]
 
-  cat rules.yaml | promtool-rules-configmap --`)
+  cat rules.yaml | promtool-configmap --`)
 }
 
 func check(r io.Reader) error {
