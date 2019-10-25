@@ -22,7 +22,7 @@ type ConfigMap struct {
 	Data       map[string]string `json:"data", yaml:"data"`
 }
 
-func (c ConfigMap) validate() error {
+func (c ConfigMap) validate(syntaxOnly bool) error {
 	if c.Kind != "ConfigMap" {
 		return fmt.Errorf("Unknown kind: %s", c.Kind)
 	}
@@ -37,7 +37,7 @@ func (c ConfigMap) validate() error {
 			return fmt.Errorf("%s contained nothing", k)
 		}
 
-		e1 := checkAsPromConfig(v)
+		e1 := checkAsPromConfig(v, syntaxOnly)
 		e2 := checkAsPromRules(v)
 
 		// TODO(adam): clean this up, virtual fs to drop
@@ -59,7 +59,7 @@ func (c ConfigMap) validate() error {
 	return nil
 }
 
-func checkAsPromConfig(raw string) error {
+func checkAsPromConfig(raw string, syntaxOnly bool) error {
 	// For now, just find promtool on PATH // TODO(adam)
 	_, err := exec.LookPath("promtool")
 	if err == nil {
@@ -73,7 +73,14 @@ func checkAsPromConfig(raw string) error {
 		if err != nil || n == 0 {
 			return fmt.Errorf("problem copying 'prom config', n=%d, err=%v", n, err)
 		}
-		out, err := exec.Command("promtool", "check", "config", fd.Name()).CombinedOutput()
+
+		var out []byte
+
+		if syntaxOnly {
+			out, err = exec.Command("promtool", "check", "config", "--syntax-only", fd.Name()).CombinedOutput()
+		} else {
+			out, err = exec.Command("promtool", "check", "config", fd.Name()).CombinedOutput()
+		}
 		if err != nil {
 			return errors.New(string(out))
 		}

@@ -20,6 +20,7 @@ const Version = "0.3.0-dev"
 var (
 	flagVerbose = flag.Bool("verbose", false, "verbose output (show promtool output)")
 	flagVersion = flag.Bool("version", false, fmt.Sprintf("Show the version (%s)", Version))
+	flagSyntax  = flag.Bool("syntax-only", false, "Use --syntax-only flag for promtool")
 )
 
 func main() {
@@ -34,7 +35,6 @@ func main() {
 		showHelp()
 		os.Exit(1)
 	}
-
 	args := flag.Args()
 	var foundErrors bool
 	for i := range args {
@@ -42,7 +42,7 @@ func main() {
 
 		// read from stdin if we see '--'
 		if rawPath == "--" {
-			if err := check(os.Stdin); err != nil {
+			if err := check(os.Stdin, *flagSyntax); err != nil {
 				foundErrors = true
 				fmt.Printf("ERROR validating rules: \n%v\n", err)
 			}
@@ -68,7 +68,7 @@ func main() {
 			fmt.Printf(" Checking %s...\n", rawPath)
 		}
 
-		if err := check(f); err != nil {
+		if err := check(f, *flagSyntax); err != nil {
 			foundErrors = true
 			fmt.Printf("ERROR validating rules for %s \n%v\n", path, err)
 			continue
@@ -94,7 +94,7 @@ USAGE
   cat rules.yaml | promtool-configmap --`)
 }
 
-func check(r io.Reader) error {
+func check(r io.Reader, syntaxOnly bool) error {
 	// be naive and read whole file
 	bs, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -119,7 +119,7 @@ func check(r io.Reader) error {
 			if cfg.Kind != "ConfigMap" {
 				continue
 			}
-			if err := cfg.validate(); err == nil {
+			if err := cfg.validate(syntaxOnly); err == nil {
 				return nil // return early if successful
 			}
 		}
@@ -129,7 +129,7 @@ func check(r io.Reader) error {
 			if cfg.Kind != "ConfigMap" {
 				continue
 			}
-			if err := cfg.validate(); err != nil {
+			if err := cfg.validate(syntaxOnly); err != nil {
 				return fmt.Errorf("ERROR: %v", err)
 			}
 		} else {
