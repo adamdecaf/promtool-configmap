@@ -19,3 +19,20 @@ before_script:
 
 script:
   - go test ./...
+
+before_deploy:
+  - GOOS=linux go build -o bin/promtool-configmap-linux github.com/adamdecaf/promtool-configmap
+  - GOOS=darwin go build -o bin/promtool-configmap-macos github.com/adamdecaf/promtool-configmap
+
+deploy:
+  provider: releases
+  api_key:
+    secure: t/hxiZJ5WYChCvHxSk1nEA3kEbU/sMJ8kVToVCffk7MlptKAwZ7MbNKHOY9qhDzM+iIzSSKNXblHshnMynq1bNJEjdgvm95gnx2zbChFN6b3Hgq+2jsYirmbtEvFwrE4N5XWjwdkkg+00A2mWtzm7Lgm4n8tJUwJuAv2NYVmvRXR598/jlNyOoWOJn/UJrF0yKGkNhr79aqTOTDE8XKx+V0V3n55rEMXCY8tGc6lzjuw/x4/8u4q/ViEqUeiHJB7WQXLhO7VchTBCeLYEMlInJJM0fkMX6cOHSS1t8A5lErRlOe9vWMZEuFVpaPq+t2rsSzx7jf/kPPNjcyMsPPudTXWvydN0HWI9Ecyxdplkbu1ynd5xleHh9whm/sMQyk5FOCzfS5QS+o/PukbEuFJSLEq3V03S3M2rz6EoPNO0ImaN2wocrpg6y1DLHeFck93+ZtzbrZwYZwUv1O2TCtIn+khNzWTRYSC5dE7xt98HuQk71vJ+j/KAk/wNHlDhKX68JeUfiiudujfO5L2wOtsNJ0qa9Ltbi3Dsftl1ta7nVLboxxyB2PMUcnG7MLKVb4MwoQakmp37d2vE220DMGzwBHONaw8/VkrHGMSEXXXy4f1eE8fsF+3mgFSp7eNVRyET/KvB4521HYK0oSET2iUzVIxxYaGfS3Fh/zwqnEber8=
+  file_glob: true
+  file:
+    - bin/promtool-configmap-*
+  on:
+    repo: adamdecaf/promtool-configmap
+    tags: true
+    go: 1.13.x
+  skip_cleanup: true
