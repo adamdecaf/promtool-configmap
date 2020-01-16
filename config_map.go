@@ -99,8 +99,13 @@ func checkAsPromRules(raw string) error {
 		}
 		return errors.New(buf.String())
 	}
-	if err := groups.Validate(); err != nil {
-		return fmt.Errorf("when validating: %v", err)
+	for i := range groups.Groups {
+		rules := groups.Groups[i].Rules
+		for j := range rules {
+			if err := rules[j].Validate(); err != nil {
+				return fmt.Errorf("when validating %s: %v", groups.Groups[i].Name, err)
+			}
+		}
 	}
 	return nil
 }
