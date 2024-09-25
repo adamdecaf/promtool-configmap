@@ -17,9 +17,9 @@ import (
 //
 // https://v1-8.docs.kubernetes.io/docs/api-reference/v1.8/#configmap-v1-core
 type ConfigMap struct {
-	ApiVersion string            `json:"apiVersion", yaml:"apiVersion"`
-	Kind       string            `json:"kind", yaml:"kind"`
-	Data       map[string]string `json:"data", yaml:"data"`
+	ApiVersion string            `json:"apiVersion" yaml:"apiVersion"`
+	Kind       string            `json:"kind" yaml:"kind"`
+	Data       map[string]string `json:"data" yaml:"data"`
 }
 
 func (c ConfigMap) validate() error {
@@ -73,7 +73,7 @@ func checkAsPromConfig(raw string) error {
 		if err != nil || n == 0 {
 			return fmt.Errorf("problem copying 'prom config', n=%d, err=%v", n, err)
 		}
-		out, err := exec.Command("promtool", "check", "config", fd.Name()).CombinedOutput()
+		out, err := exec.Command("promtool", "check", "config", fd.Name()).CombinedOutput() //nolint:gosec
 		if err != nil {
 			return errors.New(string(out))
 		}
