@@ -7,7 +7,7 @@ Run `promtool` over kubernetes `ConfigMaps` without the fuss of translating betw
 Download the [latest release](https://github.com/adamdecaf/promtool-configmap/releases/latest) for Linux or macOS.
 
 ```
-$ go install github.com/adamdecaf/promtool-configmap@latest
+go install github.com/adamdecaf/promtool-configmap@latest
 ```
 
 ### Usage
