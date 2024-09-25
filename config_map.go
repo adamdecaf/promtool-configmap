@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 
 	"github.com/prometheus/prometheus/model/rulefmt"
@@ -60,7 +61,14 @@ func (c ConfigMap) validate() error {
 
 func checkAsPromConfig(raw string) error {
 	// For now, just find promtool on PATH // TODO(adam)
+	command := "promtool"
 	_, err := exec.LookPath("promtool")
+	if err != nil {
+		_, err = os.Stat("promtool")
+		if err == nil {
+			command = filepath.Join(".", "promtool")
+		}
+	}
 	if err == nil {
 		fd, err := os.CreateTemp("", "promtool-configmap")
 		if err != nil {
@@ -72,7 +80,7 @@ func checkAsPromConfig(raw string) error {
 		if err != nil || n == 0 {
 			return fmt.Errorf("problem copying 'prom config', n=%d, err=%v", n, err)
 		}
-		out, err := exec.Command("promtool", "check", "config", fd.Name()).CombinedOutput() //nolint:gosec
+		out, err := exec.Command(command, "check", "config", fd.Name()).CombinedOutput() //nolint:gosec
 		if err != nil {
 			return errors.New(string(out))
 		}

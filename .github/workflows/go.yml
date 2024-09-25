@@ -26,5 +26,8 @@ jobs:
       if: runner.os == 'Windows'
       run: choco install -y make mingw
 
+    - name: Install promtool
+      run: make install
+
     - name: Check
       run: make check

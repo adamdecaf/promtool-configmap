@@ -8,6 +8,10 @@ else
 	SKIP_FORBIDIGO=yes COVER_THRESHOLD=0.0 ./lint-project.sh
 endif
 
+.PHONY: install
+install:
+	@./scripts/install-promtool.sh
+
 .PHONY: clean
 clean:
 	@rm -rf ./bin/ ./tmp/ coverage.txt misspell* staticcheck lint-project.sh
