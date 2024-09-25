@@ -2,3 +2,4 @@ bin/
 promtool-rules-configmap
 /promtool-configmap
 /lint-project.sh
+/coverage.txt
