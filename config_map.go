@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -63,7 +62,7 @@ func checkAsPromConfig(raw string) error {
 	// For now, just find promtool on PATH // TODO(adam)
 	_, err := exec.LookPath("promtool")
 	if err == nil {
-		fd, err := ioutil.TempFile("", "promtool-configmap")
+		fd, err := os.CreateTemp("", "promtool-configmap")
 		if err != nil {
 			return err
 		}
